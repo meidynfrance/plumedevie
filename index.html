@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plume de Vie - Votre histoire mérite d'être racontée</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --color-cream: #FBF8F3;
+            --color-beige: #E8DCC4;
+            --color-warm-brown: #A67C52;
+            --color-gold: #C9A961;
+            --color-text-dark: #3D3229;
+            --color-text-medium: #5C4F43;
+            --color-white: #FFFFFF;
+
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Inter', sans-serif;
+
+            --spacing-xs: 1rem;
+            --spacing-sm: 2rem;
+            --spacing-md: 4rem;
+            --spacing-lg: 6rem;
+            --spacing-xl: 8rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            font-size: 18px;
+            line-height: 1.7;
+            color: var(--color-text-dark);
+            background: var(--color-cream);
+            overflow-x: hidden;
+        }
+
+        /* Canvas pour l'animation de particules */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Typographie */
+        h1, h2, h3 {
+            font-family: var(--font-serif);
+            font-weight: 600;
+            line-height: 1.2;
+            color: var(--color-text-dark);
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1.5rem;
+        }
+
+        h3 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            margin-bottom: 1rem;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            color: var(--color-text-medium);
+        }
+
+        /* Boutons */
+        .btn-whatsapp {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white;
+            text-decoration: none;
+            padding: 1.25rem 2.5rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.3);
+            font-family: var(--font-sans);
+        }
+
+        .btn-whatsapp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(37, 211, 102, 0.4);
+        }
+
+        .btn-whatsapp svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        /* Sticky WhatsApp button pour mobile */
+        .whatsapp-sticky {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .whatsapp-sticky {
+                display: flex;
+                padding: 1rem 1.5rem;
+            }
+
+            .whatsapp-sticky span {
+                display: none;
+            }
+        }
+
+        /* Sections */
+        section {
+            padding: var(--spacing-lg) 0;
+            position: relative;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: var(--spacing-md) 0;
+            background: linear-gradient(180deg, var(--color-cream) 0%, var(--color-beige) 100%);
+        }
+
+        .hero-content {
+            max-width: 900px;
+        }
+
+        .hero h1 {
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--color-text-dark) 0%, var(--color-warm-brown) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 3rem;
+            color: var(--color-text-medium);
+        }
+
+        .hero-image {
+            width: 200px;
+            height: 200px;
+            margin: 3rem auto;
+            position: relative;
+        }
+
+        .hero-image svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 10px 30px rgba(166, 124, 82, 0.2));
+        }
+
+        /* Problem Section */
+        .problem {
+            background: var(--color-white);
+        }
+
+        .problem-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .problem p {
+            font-size: 1.2rem;
+            line-height: 1.9;
+        }
+
+        /* Solution Section */
+        .solution {
+            background: linear-gradient(135deg, var(--color-beige) 0%, var(--color-cream) 100%);
+        }
+
+        .solution-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .solution-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: var(--color-white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        /* How it Works */
+        .how-it-works {
+            background: var(--color-white);
+        }
+
+        .steps {
+            max-width: 1000px;
+            margin: 4rem auto 0;
+        }
+
+        .step {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 4rem;
+            align-items: center;
+            margin-bottom: 5rem;
+            padding: 3rem;
+            background: var(--color-cream);
+            border-radius: 20px;
+        }
+
+        .step:nth-child(even) {
+            grid-template-columns: 2fr 1fr;
+        }
+
+        .step:nth-child(even) .step-content {
+            order: -1;
+        }
+
+        .step-number {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-warm-brown) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-family: var(--font-serif);
+            font-weight: 700;
+            margin: 0 auto;
+            box-shadow: 0 8px 30px rgba(166, 124, 82, 0.3);
+        }
+
+        .step-content h3 {
+            margin-bottom: 1rem;
+        }
+
+        /* For Whom */
+        .for-whom {
+            background: linear-gradient(135deg, var(--color-cream) 0%, var(--color-beige) 100%);
+        }
+
+        .audience-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .audience-card {
+            background: var(--color-white);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .audience-card h3 {
+            color: var(--color-warm-brown);
+            margin-bottom: 1.5rem;
+        }
+
+        .audience-icon {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Testimonials */
+        .testimonials {
+            background: var(--color-white);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .testimonial {
+            background: var(--color-cream);
+            padding: 3rem;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .testimonial::before {
+            content: '"';
+            position: absolute;
+            top: 1rem;
+            left: 2rem;
+            font-size: 5rem;
+            font-family: var(--font-serif);
+            color: var(--color-gold);
+            opacity: 0.3;
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: var(--color-warm-brown);
+        }
+
+        /* FAQ */
+        .faq {
+            background: linear-gradient(135deg, var(--color-beige) 0%, var(--color-cream) 100%);
+        }
+
+        .faq-list {
+            max-width: 900px;
+            margin: 4rem auto 0;
+        }
+
+        .faq-item {
+            background: var(--color-white);
+            padding: 2.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .faq-question {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--color-warm-brown);
+            margin-bottom: 1rem;
+            font-family: var(--font-serif);
+        }
+
+        .faq-answer {
+            color: var(--color-text-medium);
+        }
+
+        /* CTA Final */
+        .cta-final {
+            background: var(--color-white);
+            text-align: center;
+            padding: var(--spacing-xl) 0;
+        }
+
+        .cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta-final h2 {
+            margin-bottom: 2rem;
+        }
+
+        .cta-final p {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+        }
+
+        .cta-note {
+            margin-top: 2rem;
+            font-style: italic;
+            color: var(--color-text-medium);
+            font-size: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--color-text-dark);
+            color: var(--color-beige);
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        footer p {
+            color: var(--color-beige);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-brand {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-gold);
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            :root {
+                --spacing-lg: 4rem;
+                --spacing-xl: 5rem;
+            }
+
+            body {
+                font-size: 16px;
+            }
+
+            .container {
+                padding: 0 1.5rem;
+            }
+
+            section {
+                padding: var(--spacing-md) 0;
+            }
+
+            .step {
+                grid-template-columns: 1fr !important;
+                gap: 2rem;
+            }
+
+            .step:nth-child(even) .step-content {
+                order: 0;
+            }
+
+            .audience-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .solution-features {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content fade-in">
+                <div class="hero-image">
+                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="bookGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#C9A961;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#A67C52;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Livre ouvert stylisé -->
+                        <path d="M30,60 Q30,40 50,40 L95,40 Q100,40 100,45 L100,160 Q100,165 95,165 L50,165 Q30,165 30,145 Z" fill="url(#bookGradient)" opacity="0.9"/>
+                        <path d="M170,60 Q170,40 150,40 L105,40 Q100,40 100,45 L100,160 Q100,165 105,165 L150,165 Q170,165 170,145 Z" fill="url(#bookGradient)" opacity="0.9"/>
+                        <!-- Pages -->
+                        <line x1="40" y1="60" x2="90" y2="60" stroke="#FBF8F3" stroke-width="2" opacity="0.6"/>
+                        <line x1="40" y1="75" x2="90" y2="75" stroke="#FBF8F3" stroke-width="2" opacity="0.6"/>
+                        <line x1="40" y1="90" x2="90" y2="90" stroke="#FBF8F3" stroke-width="2" opacity="0.6"/>
+                        <line x1="110" y1="60" x2="160" y2="60" stroke="#FBF8F3" stroke-width="2" opacity="0.6"/>
+                        <line x1="110" y1="75" x2="160" y2="75" stroke="#FBF8F3" stroke-width="2" opacity="0.6"/>
+                        <line x1="110" y1="90" x2="160" y2="90" stroke="#FBF8F3" stroke-width="2" opacity="0.6"/>
+                        <!-- Coeur au centre -->
+                        <path d="M100,105 L110,95 Q115,90 120,95 Q125,90 130,95 L120,110 Z" fill="#FBF8F3" opacity="0.8"/>
+                        <path d="M100,105 L90,95 Q85,90 80,95 Q75,90 70,95 L80,110 Z" fill="#FBF8F3" opacity="0.8"/>
+                    </svg>
+                </div>
+                <h1>Votre vie mérite d'être racontée</h1>
+                <p>Transformez vos souvenirs en un livre imprimé pour les générations futures</p>
+                <a href="https://wa.me/33612345678?text=Bonjour,%20je%20souhaite%20en%20savoir%20plus%20sur%20votre%20service%20de%20biographie." class="btn-whatsapp">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    </svg>
+                    <span>Discutons de votre projet</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="problem">
+        <div class="container">
+            <div class="problem-content fade-in">
+                <h2>Les souvenirs sont précieux, mais fragiles</h2>
+                <p>Combien de fois avez-vous regretté de ne pas avoir posé plus de questions à vos proches disparus ? Leurs histoires, leurs rires, leurs épreuves... Tout ce qui fait la richesse d'une vie s'efface peu à peu avec le temps.</p>
+                <p>Vos enfants, vos petits-enfants aimeraient connaître votre parcours. Savoir d'où ils viennent. Comprendre qui vous êtes vraiment.</p>
+                <p>Mais les occasions de partager ces récits se font rares, et les souvenirs s'estompent.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section class="solution">
+        <div class="container">
+            <div class="solution-content fade-in">
+                <h2>Une biographie écrite pour vous, avec vous</h2>
+                <p>Plume de Vie transforme votre histoire en un livre imprimé professionnel. Un héritage tangible qui traversera les générations.</p>
+                <div class="solution-features">
+                    <div class="feature-item fade-in">
+                        <div class="feature-icon">🤝</div>
+                        <h3>Accompagnement humain</h3>
+                        <p>Un écrivain dédié pour recueillir vos souvenirs avec bienveillance et respect</p>
+                    </div>
+                    <div class="feature-item fade-in">
+                        <div class="feature-icon">✍️</div>
+                        <h3>Clé en main</h3>
+                        <p>De l'entretien à l'impression, nous nous occupons de tout. Vous n'avez qu'à raconter</p>
+                    </div>
+                    <div class="feature-item fade-in">
+                        <div class="feature-icon">📖</div>
+                        <h3>Qualité premium</h3>
+                        <p>Un livre relié comme un vrai roman, imprimé avec soin pour durer</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works -->
+    <section class="how-it-works">
+        <div class="container">
+            <div class="fade-in" style="text-align: center; margin-bottom: 2rem;">
+                <h2>Comment ça marche ?</h2>
+                <p style="font-size: 1.2rem; max-width: 700px; margin: 0 auto;">Un processus simple et respectueux de votre rythme</p>
+            </div>
+
+            <div class="steps">
+                <div class="step fade-in">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Entretiens personnalisés</h3>
+                        <p>Nous venons chez vous ou vous rencontrons en visio pour des conversations chaleureuses. Pas d'interrogatoire, juste un dialogue authentique où vos souvenirs reprennent vie naturellement.</p>
+                        <p>Plusieurs séances espacées dans le temps, pour respecter votre énergie et laisser les souvenirs remonter.</p>
+                    </div>
+                </div>
+
+                <div class="step fade-in">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Rédaction professionnelle</h3>
+                        <p>Un écrivain transforme vos entretiens en un récit fluide et captivant. Votre voix est préservée, vos émotions respectées, votre histoire magnifiée.</p>
+                        <p>Vous recevez le manuscrit pour validation. C'est votre livre, vous avez le dernier mot.</p>
+                    </div>
+                </div>
+
+                <div class="step fade-in">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Impression premium</h3>
+                        <p>Votre biographie est imprimée comme un véritable ouvrage : couverture rigide, papier de qualité, reliure soignée.</p>
+                        <p>Vous recevez vos exemplaires, prêts à être transmis, offerts, chéris.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- For Whom -->
+    <section class="for-whom">
+        <div class="container">
+            <div class="fade-in" style="text-align: center; margin-bottom: 2rem;">
+                <h2>Pour qui ?</h2>
+            </div>
+
+            <div class="audience-grid">
+                <div class="audience-card fade-in">
+                    <div class="audience-icon">👤</div>
+                    <h3>Pour vous-même</h3>
+                    <p>Vous avez vécu une vie riche et souhaitez laisser une trace tangible à vos descendants. Raconter votre parcours, vos valeurs, vos leçons de vie.</p>
+                    <p>C'est l'occasion de transmettre ce qui compte vraiment, au-delà des photos et des objets.</p>
+                </div>
+
+                <div class="audience-card fade-in">
+                    <div class="audience-icon">🎁</div>
+                    <h3>En cadeau</h3>
+                    <p>Offrez à vos parents ou grands-parents le plus beau des présents : l'immortalité de leurs souvenirs.</p>
+                    <p>Un cadeau d'une profondeur inégalée, qui bénéficiera à toute la famille pour les décennies à venir.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="fade-in" style="text-align: center; margin-bottom: 2rem;">
+                <h2>Ils ont confié leur histoire</h2>
+            </div>
+
+            <div class="testimonials-grid">
+                <div class="testimonial fade-in">
+                    <p class="testimonial-text">J'avais peur que ce soit compliqué, mais l'écrivain a su mettre en mots ce que je ressentais confusément. Mes petits-enfants ont pleuré en lisant le livre. C'est le plus beau cadeau que je leur ai fait.</p>
+                    <p class="testimonial-author">— Marie, 78 ans</p>
+                </div>
+
+                <div class="testimonial fade-in">
+                    <p class="testimonial-text">J'ai offert cette biographie à mon père pour ses 80 ans. Voir son émotion quand il a tenu le livre dans ses mains... C'était magique. Et maintenant, nous avons son histoire pour toujours.</p>
+                    <p class="testimonial-author">— Sophie, 52 ans</p>
+                </div>
+
+                <div class="testimonial fade-in">
+                    <p class="testimonial-text">Je pensais que ma vie n'était pas assez intéressante pour un livre. Mais en racontant mes souvenirs, j'ai réalisé tout le chemin parcouru. Mes enfants ont découvert des pans entiers de mon histoire qu'ils ignoraient.</p>
+                    <p class="testimonial-author">— André, 82 ans</p>
+                </div>
+
+                <div class="testimonial fade-in">
+                    <p class="testimonial-text">L'écrivain a pris le temps de m'écouter vraiment. Aucun jugement, juste de la bienveillance. Quand j'ai lu le manuscrit, j'ai été bouleversé : c'était bien mon histoire, mais racontée avec une élégance que je n'aurais jamais su lui donner.</p>
+                    <p class="testimonial-author">— Jean-Claude, 75 ans</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq">
+        <div class="container">
+            <div class="fade-in" style="text-align: center; margin-bottom: 2rem;">
+                <h2>Questions fréquentes</h2>
+            </div>
+
+            <div class="faq-list">
+                <div class="faq-item fade-in">
+                    <h3 class="faq-question">Combien de temps dure le processus ?</h3>
+                    <p class="faq-answer">En moyenne, entre 3 et 6 mois, selon votre disponibilité et le volume de votre récit. Nous respectons votre rythme. Les entretiens sont espacés pour que vous puissiez vous reposer et laisser les souvenirs remonter naturellement.</p>
+                </div>
+
+                <div class="faq-item fade-in">
+                    <h3 class="faq-question">Comment se passent les entretiens ?</h3>
+                    <p class="faq-answer">Nous privilégions les rencontres à votre domicile pour votre confort, mais la visio est aussi possible. Chaque entretien dure 1h à 2h, dans une ambiance détendue et bienveillante. Vous racontez, nous écoutons et guidons doucement le récit.</p>
+                </div>
+
+                <div class="faq-item fade-in">
+                    <h3 class="faq-question">Pourquoi ce prix ?</h3>
+                    <p class="faq-answer">À partir de 3 000€, notre tarif reflète un travail artisanal de qualité : plusieurs heures d'entretiens, une rédaction professionnelle personnalisée, et une impression premium en plusieurs exemplaires. C'est un investissement dans la mémoire familiale qui durera des générations.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="cta-final">
+        <div class="container">
+            <div class="cta-content fade-in">
+                <h2>Le temps passe, les souvenirs restent</h2>
+                <p>Chaque jour qui passe est un souvenir qui s'estompe. Offrez-vous ou offrez à vos proches ce cadeau intemporel : une histoire préservée, un héritage transmis, une vie racontée.</p>
+                <a href="https://wa.me/33612345678?text=Bonjour,%20je%20souhaite%20en%20savoir%20plus%20sur%20votre%20service%20de%20biographie." class="btn-whatsapp">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    </svg>
+                    <span>Commençons ensemble</span>
+                </a>
+                <p class="cta-note">Échangeons simplement, sans engagement</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p class="footer-brand">Plume de Vie</p>
+            <p>Votre histoire mérite d'être racontée</p>
+            <p style="margin-top: 2rem; font-size: 0.9rem; opacity: 0.7;">© 2024 Plume de Vie. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <!-- Sticky WhatsApp Button -->
+    <a href="https://wa.me/33612345678?text=Bonjour,%20je%20souhaite%20en%20savoir%20plus%20sur%20votre%20service%20de%20biographie." class="btn-whatsapp whatsapp-sticky">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+        </svg>
+        <span>Nous contacter</span>
+    </a>
+
+    <script>
+        // Animation des particules
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        const particleCount = 50;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.opacity = Math.random() * 0.5 + 0.2;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(201, 169, 97, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+
+        // Resize canvas
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Fade-in au scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, index * 100);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach((el) => {
+            observer.observe(el);
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
